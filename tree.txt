@@ -1,27 +1,31 @@
 .
-├── 2_db-lab02.pptx -------实验文档
+├── 2_db-lab02.pptx
 ├── __pycache__
 │   └── db.cpython-311.pyc
-├── db.py -------与数据库交互
-├── main.py -------与网页交互，调用db.py中的函数
-├── mysql 
-│   ├── procedures.sql -------存储过程、函数、触发器
-│   └── table_init.sql -------初始化表
+├── db.py
+├── main.py
+├── mysql
+│   ├── procedures.sql
+│   └── table_init.sql
 ├── report
-│   ├── ER.drawio -------ER图的drawio文件
-│   ├── ER.drawio.png -------ER图
+│   ├── ER.drawio
+│   ├── ER.drawio.png
 │   ├── src
 │   │   └── logo.png
-│   ├── 银行管理系统_需求分析.md -------需求分析
-│   ├── 银行管理系统_需求分析.pdf -------需求分析
-│   ├── 数据库实验报告.md -------实验报告(.md)
-│   └── 银行管理系统报告_熊习乔_PB21151828.pdf -------实验报告(.pdf)
+│   ├── 流程图.drawio
+│   ├── 流程图.drawio.png
+│   ├── 系统模块结构.drawio
+│   ├── 系统模块结构.drawio.png
+│   ├── 银行管理系统_需求分析.md
+│   ├── 银行管理系统_需求分析.pdf
+│   ├── 数据库实验报告.md
+│   └── 银行管理系统报告_熊习乔_PB21151828.pdf
 ├── static
-│   └── photos -------员工照片
+│   └── photos
 │       ├── 111.bmp
 │       ├── 112.bmp
 │       └── 113.bmp
-├── templates -------存放html文件
+├── templates
 │   ├── account.html
 │   ├── back.html
 │   ├── bank.html
@@ -32,6 +36,6 @@
 │   ├── homepage.html
 │   ├── loan.html
 │   └── login.html
-└── tree.txt -------目录树
+└── tree.txt
 
-8 directories, 29 files
+8 directories, 31 files
