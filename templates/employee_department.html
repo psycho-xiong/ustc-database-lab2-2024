@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>员工-部门管理</title>
+<script>
+// 用于显示操作结果的函数
+function showResult(operation, result) {
+    var message;
+    if (result == 1) {
+        message = operation + '成功！';
+    } 
+    else if (result == -1) {
+        message = 'pymysql操作失败！';
+    }
+    else if (result == -2) {
+        message = '（新）员工不存在！';
+    }
+    else if (result == -3) {
+        message = '员工-部门重复！';
+    }
+    else if (result == -4) {
+        message = '（新）部门不存在！';
+    }
+    else if (result == -5) {
+        message = '员工-部门不存在！';
+    }
+    else if (result == -6) {
+        message = '（旧）部门不存在！';
+    }
+    else if (result == -7) {
+        message = '（旧）员工不存在！';
+    }
+    else if (result == -8) {
+        message = '未知，MySQL错误！';
+    }
+    else if (result == -9) {
+        message = '该部门领导为该员工！';
+    }
+    alert(message);
+}
+
+// 删除操作前的确认函数
+function confirmDelete(employee_id, department_id) {
+    if (confirm('确定要删除 ' + employee_id + '-' + department_id + ' 吗')) {
+        // 如果用户点击"确定"，则提交表单
+        document.getElementById('deleteForm').submit();
+    }
+    else {
+        // 如果用户点击"取消"，则取消提交，返回到原页面
+        event.preventDefault();
+        return false;
+    }
+}
+</script>
+</head>
+
+<a href="{{url_for('homepage')}}">
+    <button>返回主页</button>
+</a>
+
+<body>
+
+<h1>员工-部门管理</h1>
+
+<!-- 查询表单 -->
+<h2>查询员工-部门</h2>
+<form method="post">
+    <label for="search_text">查询内容：</label>
+    <input type="text" id="search_text" name="search_text" placeholder="留空显示所有"> 
+    <select name="search_type" required>
+        <option value="Employee">员工ID：</option>
+        <option value="Department">部门ID：</option>
+    </select>
+    <input type="submit" name="SEARCH" value="查询">
+</form>
+
+<!-- 增加表单 -->
+<h2>增加员工-部门</h2>
+<form method="post">
+    <label for="add_employee_id">员工ID：</label>
+    <input type="text" id="add_employee_id" name="add_employee_id" required>
+    <label for="add_department_id">部门ID：</label>
+    <input type="text" id="add_department_id" name="add_department_id" required>
+    <input type="submit" name="ADD" value="添加">
+</form>
+{% if add_res %}
+    <script>
+    showResult('添加', '{{add_res}}')
+    </script>
+{% endif %}
+
+
+
+<!-- 修改表单 -->
+<h2>修改员工-部门</h2>
+<form method="post">
+    <label for="old_employee_id">原员工ID：</label>
+    <input type="text" id="old_employee_id" name="old_employee_id" required>
+    <label for="old_department_id">原部门ID：</label>
+    <input type="text" id="old_department_id" name="old_department_id" required>
+    <br>
+    <label for="new_employee_id">新员工ID：</label>
+    <input type="text" id="new_employee_id" name="new_employee_id" required>
+    <label for="new_department_id">新部门ID：</label>
+    <input type="text" id="new_department_id" name="new_department_id" required>
+    <input type="submit" name="UPDATE" value="修改">
+</form>
+{% if update_res %}
+    <script>
+    showResult('修改', '{{update_res}}')
+    </script>
+{% endif %}
+
+<!-- 删除表单 -->
+<h2>删除员工-部门</h2>
+<form id="deleteForm" method="post">
+    <label for="delete_employee_id">员工：</label>
+    <input type="text" id="delete_employee_id" name="delete_employee_id" required>
+    <label for="delete_department_id">部门：</label>
+    <input type="text" id="delete_department_id" name="delete_department_id" required>
+    <input type="submit" name="DELETE" value="删除" onclick="return confirmDelete(delete_employee_id.value, delete_department_id.value)">
+</form>
+{% if delete_res %}
+    <script>
+    showResult('删除', '{{delete_res}}')
+    </script>
+{% endif %}
+
+<!-- 查询结果显示区域 -->
+<div id="searchResults">
+    <h2>查询结果</h2>
+    <!-- 这里将从后端传入的查询结果循环显示 -->
+    {% if search_res %}
+        <table>
+            <tr>
+                <th>员工ID</th>
+                <th>部门ID</th>
+            </tr>
+            {% for department in search_res %}
+                <tr>
+                    <td>{{ department[0] }}</td>
+                    <td>{{ department[1] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>没有找到相关员工-部门。</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

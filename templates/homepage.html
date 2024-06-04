@@ -1,0 +1,32 @@
+<!doctype html>
+<title>Home</title>
+
+<body>
+  <section class="content">
+    <header>
+      <h1 >Welcome!</h1>
+    </header>
+  
+    <form method="post" id="operations"> 
+      <div>
+        <input id = "CustomerBtn" type="submit" name = "Customer" value="Customer"> 
+        <input id = "BankBtn" type="submit" name = "Bank" value="Bank">
+        <input id = "AccountBtn" type="submit" name = "Account" value="Account">
+        <input id = "LoanBtn" type="submit" name = "Loan" value="Loan">
+        <input id = "EmployeeBtn" type="submit" name = "Employee" value="Employee" >
+        <input id = "DepartmentBtn" type="submit" name = "Department" value="Department" >
+        <input id = "EmployeeDepartmentBtn" type="submit" name = "Employee_Department" value="Employee_Department" >
+      </div>
+    </form>
+    <p id="ymd"></p>
+    <script>
+        var date = new Date();
+        var y = date.getFullYear();
+        var m = date.getMonth()+1;
+        var d = date.getDate(); 
+        document.getElementById("ymd").innerHTML = "当前日期："+y+"-"+m+"-"+d;
+    </script>
+    <script type="text/javascript"></script>
+    
+  </section>
+</body>

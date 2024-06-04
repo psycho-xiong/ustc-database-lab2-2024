@@ -1,0 +1,36 @@
+<!doctype html>
+<title>Database Login</title>
+
+<body>
+    <section class="content">
+    <header>
+        <h1>Login In</h1>
+        <script>
+        function warning(status){
+            if (status == -1) 
+                alert("Login failed!\nPlease check Username & password.\nNote: Username should be \"root\"");
+        }
+        </script>
+    </header>
+  
+    <form method="post">
+      
+        <label for="username">Username</label>
+            <input type="text" name="username" id="username" required>
+        <p></p>
+        <label for="password">Password</label>
+            <input type="password" name="password" id="password" required>
+        <p></p>
+        <input type="submit" value="Log In">
+  
+    </form>
+    </section>
+
+    <!-- If login failed, which means status==0, a window to show error -->
+    {% if status == -1 %}
+        <script>
+            // 假设 status 变量已经被设置，例如从 app.py 传递过来
+            alert("Login failed!\nPlease check Username & password.\nNote: Username should be \"root\"");
+        </script>
+    {% endif %}
+</body>

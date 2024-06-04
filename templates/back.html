@@ -1,0 +1,113 @@
+<!doctype html>
+<title>Customer</title>
+
+<body>
+<section class="content">
+    <header>
+        <h1>客户操作</h1>
+        <script>
+        function delconf(old_id){
+            str="你确定要删除id为"+old_id+"的客户信息吗？";
+            conf=window.confirm(str);
+            delstr='yesDel'+old_id
+            delcheck({{del_res}});
+            if(conf) document.getElementById(delstr).click();
+        }
+        function addcheck(res){
+            if(res == 0) alert("添加成功！");
+            else alert("添加失败，请重新检查您的输入，是否有留空或重复的ID？");
+        }
+        function updatecheck(res){
+            if(res == 0) alert("修改成功！");
+            else alert("修改失败，请重新检查您的输入。");
+        }
+        function delcheck(res){
+            if(res==0) alert("删除成功！");
+            else alert("删除失败，用户可能有账户或贷款存在。请先删除账户或贷款后再删除用户。");
+        }
+        </script>
+    </header>
+
+    <a href="{{url_for('homepage')}}">
+        <button>返回首页</button>
+    </a>
+
+    <br>
+
+    <!-- 搜索客户 -->
+    <form method="post" id="search"> 
+        搜索关键词：
+        <input id = "SEARCHTEXT" type="text" name = "search_text" style="width: 10em;" placeholder="留空显示所有客户" > 
+        按：
+        <select name="search_type">
+            <option value="name">姓名</option>
+            <option value="ID">身份证号</option>
+        </select>
+        <input id = "SEARCH" type="submit" name = "SEARCH" autofocus="true" value="搜索客户" >
+    </form>
+
+    <br>
+
+    <!-- 添加客户 -->
+    <form method="post" id="add"> 
+    添加客户
+    <input id = "add_id" type="text" pattern="[0-9]{5,}" maxlength="5" name = "add_id" placeholder="5位ID" >
+    <input id = "add_name" type="text" name = "add_name" placeholder="姓名" >
+    <input id = "ADD" type="submit" name = "ADD" value="添加客户">
+    </form>
+
+
+        
+    <!-- <div id = "addcos" style="display: none;">
+        <p>待添加客户详细信息：</p><br>
+        <input id = "add_id" type="text" pattern="[0-9]{5,}" maxlength="5" name = "add_id" placeholder="5位ID" >
+        <input id = "add_name" type="text" name = "add_name" placeholder="姓名" >
+        <input id = "ADD" type="submit" name = "ADD" value="添加客户">
+    </div>
+    </form> -->
+    <br>
+    
+    <div>
+        <button id="showinput" class="showinput"  onclick="document.getElementById('addcos').style='background-color: aqua; ';this.style='display: none'">添加客户</button>
+        <script>
+            addcheck({{add_res}});
+        </script>
+    </div>
+
+    <br>
+    <div><div style="color: red;float: left;">{{search_text}}</div> 一共找到{{search_res|length}}条记录</div>
+    <table>
+        <thead>
+            <tr>
+                <th> ID</th>
+                <th> 姓名 </th>
+                <th> 操作 </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in search_res %}
+        <tr>
+            <td> {{ row[0]  }}</td>
+            <td> {{ row[1]  }}</td>
+            <td> <button onclick="document.getElementById({{row[0]}}).style=''">改</button>/<button onclick="delconf({{row[0]}})">删</button> </td>
+        </tr>
+
+        <tr id = "{{row[0]}}" style="display: none;">
+            <form method="POST" id="ChangeOpr">
+            <input id = "old_id" type=input name="old_id" value="{{row[0]}}" style="display: none;">
+            <!-- <input id = "yesDel{{row[0]}}" type = "submit" name = "DEL" style="display:none;" value="已经确认删除"> -->
+            <td> <input id="new_id" type="text" name="new_id"> </td>
+            <td> <input id="new_name" type="text" name="new_name"></td>
+            <td> <input type="submit" name="CHANGE" value="修改"> </td>
+            <script>
+                updatecheck({{update_res}});
+            </script>
+            </form>
+
+            <!-- <input id = "yesDel{{row[0]}}" type = "submit" name = "DEL" style="display:none;" value="已经确认删除"> -->
+        </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+</section>
+</body>

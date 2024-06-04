@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>部门管理</title>
+<script>
+// 用于显示操作结果的函数
+function showResult(operation, result) {
+    var message;
+    if (result == 1) {
+        message = operation + '成功！';
+    } 
+    else if (result == -1) {
+        message = 'pymysql操作失败！';
+    }
+    else if (result == -2) {
+        message = '部门不存在！';
+    }
+    else if (result == -3) {
+        message = '(旧)支行不存在！';
+    }
+    else if (result == -4) {
+        message = '(新)支行不存在！';
+    }
+    else if (result == -5) {
+        message = '领导不存在！';
+    }
+    else if (result == -6) {
+        message = '部门重复！';
+    }
+    alert(message);
+}
+
+// 删除操作前的确认函数
+function confirmDelete(department_id) {
+    if (confirm('确定要删除ID为 ' + department_id +  '的部门吗？')) {
+        // 如果用户点击"确定"，则提交表单
+        document.getElementById('deleteForm').submit();
+    }
+    else {
+        // 如果用户点击"取消"，则取消提交，返回到原页面
+        event.preventDefault();
+        return false;
+    }
+}
+</script>
+</head>
+
+<a href="{{url_for('homepage')}}">
+    <button>返回主页</button>
+</a>
+
+<body>
+
+<h1>部门管理</h1>
+
+<!-- 查询表单 -->
+<h2>查询部门</h2>
+<!-- 选择A或B的单选按钮 -->
+<label for="optionA">
+    <input type="radio" id="optionA" name="choice" value="A">
+    部门ID
+</label>
+<label for="optionB">
+    <input type="radio" id="optionB" name="choice" value="B">
+    支行 & 部门名 & 领导ID
+</label>
+<!-- 根据选择的选项显示不同的输入框 -->
+<div id="inputContainer">
+    <!-- 如果选择了A，则显示一个输入框 -->
+    <form method="post">
+        <input type="hidden" id="search_type" name="search_type" value="ID">
+        <input type="text" id="DepartmentID" name="DepartmentID" placeholder="留空显示所有">  
+        <input type="submit" name="SEARCH" value="查询">
+    </form>
+</div>
+
+<!-- 如果选择了B，则显示三个输入框 -->
+<div id="inputContainerB" style="display:none;">
+    <form method="post">
+        <input type="hidden" id="search_type" name="search_type" value="NON_ID">
+        <input type="text" id="Bank" name="Bank" placeholder="可留空">
+        <input type="text" id="Department" name="Department" placeholder="可留空">
+        <input type="text" id="LeaderID" name="LeaderID" placeholder="可留空">
+        <input type="submit" name="SEARCH" value="查询">
+    </form>
+</div>
+
+<script>
+// 选择A时显示一个输入框，选择B时显示三个输入框
+document.getElementById('optionA').addEventListener('click', function() {
+    document.getElementById('inputContainerB').style.display = 'none';
+    document.getElementById('inputContainer').style.display = 'block';
+});
+
+document.getElementById('optionB').addEventListener('click', function() {
+    document.getElementById('inputContainer').style.display = 'none';
+    document.getElementById('inputContainerB').style.display = 'block';
+});
+</script>
+
+<!-- <form method="post">
+    <label for="search_text">查询内容（留空显示所有部门）：</label>
+    <p>支行：<input type="text" id="Bank" name="Bank">  </p>
+    <p>部门：<input type="text" id="Department" name="Department">  </p>
+    <p>领导ID：<input type="text" id="LeaderID" name="LeaderID">  </p>
+    <input type="submit" name="SEARCH" value="查询">
+</form> -->
+
+
+
+<!-- 增加表单 -->
+<h2>增加部门</h2>
+<form method="post">
+    <label for="add_id">部门ID：</label>
+    <input type="text" id="add_id" name="add_id" required>
+    <label for="add_bank">支行：</label>
+    <input type="text" id="add_bank" name="add_bank" required>
+    <label for="add_depart">部门：</label>
+    <input type="text" id="add_depart" name="add_depart" required>
+    <label for="add_leader">领导ID：</label>
+    <input type="text" name="add_leader" id="add_leader" required>
+    <input type="submit" name="ADD" value="添加">
+</form>
+{% if add_res %}
+    <script>
+    showResult('添加', '{{add_res}}')
+    </script>
+{% endif %}
+
+
+
+<!-- 修改表单 -->
+<h2>修改部门</h2>
+<form method="post">
+    <label for="old_id">原部门ID：</label>
+    <input type="text" id="old_id" name="old_id" required>
+    <br>
+    <label for="new_id">新部门ID：</label>
+    <input type="text" id="new_id" name="new_id" required>
+    <label for="new_bank">新支行：</label>
+    <input type="text" id="new_bank" name="new_bank" required>
+    <label for="new_depart">新部门：</label>
+    <input type="text" id="new_depart" name="new_depart" required>
+    <label for="new_leader">新领导ID：</label>
+    <input type="text" name="new_leader" id="new_leader" required>
+    <input type="submit" name="UPDATE" value="修改">
+</form>
+{% if update_res %}
+    <script>
+    showResult('修改', '{{update_res}}')
+    </script>
+{% endif %}
+
+<!-- 删除表单 -->
+<h2>删除部门</h2>
+<form id="deleteForm" method="post">
+    <label for="delete_id">部门ID：</label>
+    <input type="text" id="delete_id" name="delete_id" required>
+    <input type="submit" name="DELETE" value="删除" onclick="return confirmDelete(delete_id.value)">
+</form>
+{% if delete_res %}
+    <script>
+    showResult('删除', '{{delete_res}}')
+    </script>
+{% endif %}
+
+<!-- 查询结果显示区域 -->
+<div id="searchResults">
+    <h2>查询结果</h2>
+    <!-- 这里将从后端传入的查询结果循环显示 -->
+    {% if search_res %}
+        <table>
+            <tr>
+                <th>部门ID</th>
+                <th>支行</th>
+                <th>部门</th>
+                <th>领导ID</th>
+            </tr>
+            {% for department in search_res %}
+                <tr>
+                    <td>{{ department[0] }}</td>
+                    <td>{{ department[1] }}</td>
+                    <td>{{ department[2] }}</td>
+                    <td>{{ department[3] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>没有找到相关部门。</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

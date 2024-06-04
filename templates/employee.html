@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>员工管理</title>
+<script>
+// 用于显示操作结果的函数
+function showResult(operation, result) {
+    var message;
+    if (result == 1) {
+        message = operation + '成功！';
+    } 
+    else if (result == -1) {
+        message = 'pymysql操作失败！';
+    }
+    else if (result == -2) {
+        message = '员工不存在！';
+    }
+    else if (result == -3) {
+        message = '员工已存在！';
+    }
+    else if (result == -4) {
+        message = '员工ID重复！';
+    }
+    alert(message);
+}
+
+// 删除操作前的确认函数
+function confirmDelete(id) {
+    if (confirm('确定要删除ID为 ' + id + ' 的员工吗？')) {
+        // 如果用户点击"确定"，则提交表单
+        document.getElementById('deleteForm').submit();
+    }
+    else {
+        // 如果用户点击"取消"，则取消提交，返回到原页面
+        event.preventDefault();
+        return false;
+    }
+}
+</script>
+</head>
+
+<a href="{{url_for('homepage')}}">
+    <button>返回主页</button>
+</a>
+
+<body>
+
+<h1>员工管理</h1>
+
+<!-- 查询表单 -->
+<h2>查询员工</h2>
+<form method="post">
+    <label for="search_text">查询内容：</label>
+    <input type="text" id="search_text" name="search_text" placeholder="留空显示所有员工"> 
+    <select name="search_type" required>
+        <option value="ID">ID</option>
+        <option value="Name">姓名</option>
+    </select>
+    <input type="submit" name="SEARCH" value="查询">
+</form>
+
+<!-- 增加表单 -->
+<h2>增加员工</h2>
+<form method="post" enctype="multipart/form-data">
+    <label for="add_id">ID：</label>
+    <input type="text" id="add_id" name="add_id" required>
+    <label for="add_name">姓名：</label>
+    <input type="text" id="add_name" name="add_name" required>
+    <label for="add_photo">照片：</label>
+    <input type="file" name="add_photo" id="add_photo" accept="image/*">
+    <input type="submit" name="ADD" value="添加">
+</form>
+{% if add_res %}
+    <script>
+    showResult('添加', '{{add_res}}')
+    </script>
+{% endif %}
+
+
+
+<!-- 修改表单 -->
+<h2>修改员工</h2>
+<form method="post" enctype="multipart/form-data">
+    <label for="old_id">原ID：</label>
+    <input type="text" id="old_id" name="old_id" required>
+    <label for="new_id">新ID：</label>
+    <input type="text" id="new_id" name="new_id" required>
+    <label for="new_name">新姓名：</label>
+    <input type="text" id="new_name" name="new_name" required>
+    <label for="new_photo">新照片：</label>
+    <input type="file" name="new_photo" id="new_photo" accept="image/*" placeholder="不上传则保留原照片">
+    <input type="submit" name="UPDATE" value="修改">
+</form>
+{% if update_res %}
+    <script>
+    showResult('修改', '{{update_res}}')
+    </script>
+{% endif %}
+
+<!-- 删除表单 -->
+<h2>删除员工</h2>
+<form id="deleteForm" method="post">
+    <label for="delete_id">ID：</label>
+    <input type="text" id="delete_id" name="delete_id" required>
+    <input type="submit" name="DELETE" value="删除" onclick="return confirmDelete(delete_id.value)">
+</form>
+{% if delete_res %}
+    <script>
+    showResult('删除', '{{delete_res}}')
+    </script>
+{% endif %}
+
+<!-- 查询结果显示区域 -->
+<div id="searchResults">
+    <h2>查询结果</h2>
+    <!-- 这里将从后端传入的查询结果循环显示 -->
+    {% if search_res %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>姓名</th>
+                <th>照片</th>
+            </tr>
+            {% for employee in search_res %}
+                <tr>
+                    <td>{{ employee[0] }}</td>
+                    <td>{{ employee[1] }}</td>
+                    <td><img src="{{url_for('static', filename='photos/' + employee[2])}}" width="100" height="100"></td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>没有找到相关员工。</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

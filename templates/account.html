@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>账户管理</title>
+<script>
+// 用于显示操作结果的函数
+function showResult(operation, result) {
+    var message;
+    if (result == 1) {
+        message = operation + '成功！';
+    } 
+    else if (result == -1) {
+        message = 'pymysql操作失败！';
+    }
+    else if (result == -2) {
+        message = '账户不存在！';
+    }
+    else if (result == -3) {
+        message = '余额不足';
+    }
+    else if (result == -4) {
+        message = '支行不存在！';
+    }
+    else if (result == -5) {
+        message = '用户不存在！';
+    }
+    else if (result == -6) {
+        message = '账户已存在！';
+    }
+    else if (result == -7) {
+        message = '小数部分过长！';
+    }
+    else if (result == -8) {
+        message = '数字总长过长！';
+    }
+    else if (result == -9) {
+        message = 'Uknow error within MySQL!';
+    }
+    else if (result == -10) {
+        message = '金额不是数字！';
+    }
+    else if (result == -11){
+        message = '金额不能是负数！';
+    }
+    else if (result == -12){
+        message = '转入账户与转出账户不能相同！';
+    }
+    alert(message);
+}
+
+// 删除操作前的确认函数
+function confirmDelete(account_id) {
+    if (confirm('确定要删除ID为 ' + account_id +  '的账户吗？')) {
+        // 如果用户点击"确定"，则提交表单
+        document.getElementById('deleteForm').submit();
+    }
+    else {
+        // 如果用户点击"取消"，则取消提交，返回到原页面
+        event.preventDefault();
+        return false;
+    }
+}
+</script>
+</head>
+
+<a href="{{url_for('homepage')}}">
+    <button>返回主页</button>
+</a>
+
+<body>
+
+<h1>账户管理</h1>
+
+<!-- 查询表单 -->
+<h2>查询账户</h2>
+<!-- 选择A或B的单选按钮 -->
+<label for="optionA">
+    <input type="radio" id="optionA" name="choice" value="A">
+    账户ID
+</label>
+<label for="optionB">
+    <input type="radio" id="optionB" name="choice" value="B">
+    用户ID & 支行
+</label>
+<!-- 根据选择的选项显示不同的输入框 -->
+<div id="inputContainer">
+    <!-- 如果选择了A，则显示一个输入框 -->
+    <form method="post">
+        <input type="hidden" id="search_type" name="search_type" value="ID">
+        <input type="text" id="AccountID" name="AccountID" placeholder="留空显示所有">  
+        <input type="submit" name="SEARCH" value="查询">
+    </form>
+</div>
+
+<!-- 如果选择了B，则显示三个输入框 -->
+<div id="inputContainerB" style="display:none;">
+    <form method="post">
+        <input type="hidden" id="search_type" name="search_type" value="NON_ID">
+        <input type="text" id="CustomerID" name="CustomerID" placeholder="可留空">
+        <input type="text" id="BankName" name="BankName" placeholder="可留空">
+        <input type="submit" name="SEARCH" value="查询">
+    </form>
+</div>
+
+<script>
+// 选择A时显示一个输入框，选择B时显示三个输入框
+document.getElementById('optionA').addEventListener('click', function() {
+    document.getElementById('inputContainerB').style.display = 'none';
+    document.getElementById('inputContainer').style.display = 'block';
+});
+
+document.getElementById('optionB').addEventListener('click', function() {
+    document.getElementById('inputContainer').style.display = 'none';
+    document.getElementById('inputContainerB').style.display = 'block';
+});
+</script>
+
+
+
+<!-- 增加表单 -->
+<h2>增加账户</h2>
+<form method="post">
+    <label for="add_account_id">账户ID：</label>
+    <input type="text" id="add_account_id" name="add_account_id" required>
+    <label for="add_customer_id">用户ID：</label>
+    <input type="text" id="add_customer_id" name="add_customer_id" required>
+    <label for="add_bank_name">支行：</label>
+    <input type="text" id="add_bank_name" name="add_bank_name" required>
+    <input type="submit" name="ADD" value="添加">
+</form>
+{% if add_res %}
+    <script>
+    showResult('添加', '{{add_res}}')
+    </script>
+{% endif %}
+
+
+
+<!-- 修改表单 -->
+<h2>修改账户</h2>
+<form method="post">
+    <label for="old_account_id">原账户ID：</label>
+    <input type="text" id="old_account_id" name="old_account_id" required>
+    <br>
+    <label for="new_account_id">新账户ID：</label>
+    <input type="text" id="new_account_id" name="new_account_id" required>
+    <label for="new_balance">新余额：</label>
+    <input type="text" id="new_balance" name="new_balance" required>
+    <label for="new_customer_id">新用户ID：</label>
+    <input type="text" id="new_customer_id" name="new_customer_id" required>
+    <label for="new_bank_name">新支行：</label>
+    <input type="text" name="new_bank_name" id="new_bank_name" required>
+    <input type="submit" name="UPDATE" value="修改">
+</form>
+{% if update_res %}
+    <script>
+    showResult('修改', '{{update_res}}')
+    </script>
+{% endif %}
+
+<!-- 删除表单 -->
+<h2>删除账户</h2>
+<form id="deleteForm" method="post">
+    <label for="delete_account_id">账户ID：</label>
+    <input type="text" id="delete_account_id" name="delete_account_id" required>
+    <input type="submit" name="DELETE" value="删除" onclick="return confirmDelete(delete_account_id.value)">
+</form>
+{% if delete_res %}
+    <script>
+    showResult('删除', '{{delete_res}}')
+    </script>
+{% endif %}
+
+<!-- 转账表单 -->
+<h2>转账</h2>
+<form method="post">
+    <label for="from_id">转出账户ID：</label>
+    <input type="text" id="from_id" name="from_id" required>
+    <label for="to_id">转入账户ID：</label>
+    <input type="text" id="to_id" name="to_id" required>
+    <label for="amount">转账金额：</label>
+    <input type="text" id="amount" name="amount" required>
+    <input type="submit" name="TRANSFER" value="转账">
+</form>
+{% if transfer_res %}
+    <script>
+    showResult('转账', '{{transfer_res}}')
+    </script>
+{% endif %}
+
+<!-- 查询结果显示区域 -->
+<div id="searchResults">
+    <h2>查询结果</h2>
+    <!-- 这里将从后端传入的查询结果循环显示 -->
+    {% if search_res %}
+        <table>
+            <tr>
+                <th>账户ID</th>
+                <th>余额</th>
+                <th>用户ID</th>
+                <th>支行</th>
+            </tr>
+            {% for department in search_res %}
+                <tr>
+                    <td>{{ department[0] }}</td>
+                    <td>{{ department[1] }}</td>
+                    <td>{{ department[2] }}</td>
+                    <td>{{ department[3] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>没有找到相关账户。</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

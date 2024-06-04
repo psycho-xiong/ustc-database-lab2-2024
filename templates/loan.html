@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>贷款管理</title>
+<script>
+// 用于显示操作结果的函数
+function showResult(operation, result) {
+    var message;
+    if (result == 1) {
+        message = operation + '成功！';
+    } 
+    else if (result == -1) {
+        message = 'pymysql操作失败！';
+    }
+    else if (result == -2) {
+        message = '贷款不存在！';
+    }
+    else if (result == -3) {
+        message = '账户不存在！';
+    }
+    else if (result == -4) {
+        message = '余额不足！';
+    }
+    else if (result == -5) {
+        message = '支行不存在！';
+    }
+    else if (result == -6) {
+        message = '用户不存在！';
+    }
+    else if (result == -7) {
+        message = '小数部分过长！';
+    }
+    else if (result == -8) {
+        message = '数字总长过长！';
+    }
+    else if (result == -9) {
+        message = 'Uknow error within MySQL!';
+    }
+    else if (result == -10) {
+        message = '金额不是数字！';
+    }
+    else if (result == -11){
+        message = '金额不能是负数！';
+    }
+    else if (result == -12){
+        message = '贷款总额不能为0！';
+    }
+    else if (result == -13){
+        message = '还款数不能为0！';
+    }
+    else if (result == -14){
+        message = '未还款数不能大于贷款总数'
+    }
+    else if (result == -15){
+        message = '贷款已存在';
+    }
+    alert(message);
+}
+
+// 删除操作前的确认函数
+function confirmDelete(loan_id) {
+    if (confirm('确定要删除ID为 ' + loan_id +  '的贷款吗？')) {
+        // 如果用户点击"确定"，则提交表单
+        document.getElementById('deleteForm').submit();
+    }
+    else {
+        // 如果用户点击"取消"，则取消提交，返回到原页面
+        event.preventDefault();
+        return false;
+    }
+}
+</script>
+</head>
+
+<a href="{{url_for('homepage')}}">
+    <button>返回主页</button>
+</a>
+
+<body>
+
+<h1>贷款管理</h1>
+
+<!-- 查询表单 -->
+<h2>查询贷款</h2>
+<!-- 选择A或B的单选按钮 -->
+<label for="optionA">
+    <input type="radio" id="optionA" name="choice" value="A">
+    贷款ID
+</label>
+<label for="optionB">
+    <input type="radio" id="optionB" name="choice" value="B">
+    用户ID & 支行
+</label>
+<!-- 根据选择的选项显示不同的输入框 -->
+<div id="inputContainer">
+    <!-- 如果选择了A，则显示一个输入框 -->
+    <form method="post">
+        <input type="hidden" id="search_type" name="search_type" value="ID">
+        <input type="text" id="LoanID" name="LoanID" placeholder="留空显示所有">  
+        <input type="submit" name="SEARCH" value="查询">
+    </form>
+</div>
+
+<!-- 如果选择了B，则显示三个输入框 -->
+<div id="inputContainerB" style="display:none;">
+    <form method="post">
+        <input type="hidden" id="search_type" name="search_type" value="NON_ID">
+        <input type="text" id="CustomerID" name="CustomerID" placeholder="可留空">
+        <input type="text" id="BankName" name="BankName" placeholder="可留空">
+        <input type="submit" name="SEARCH" value="查询">
+    </form>
+</div>
+
+<script>
+// 选择A时显示一个输入框，选择B时显示三个输入框
+document.getElementById('optionA').addEventListener('click', function() {
+    document.getElementById('inputContainerB').style.display = 'none';
+    document.getElementById('inputContainer').style.display = 'block';
+});
+
+document.getElementById('optionB').addEventListener('click', function() {
+    document.getElementById('inputContainer').style.display = 'none';
+    document.getElementById('inputContainerB').style.display = 'block';
+});
+</script>
+
+
+
+<!-- 增加表单 -->
+<h2>增加贷款</h2>
+<form method="post">
+    <label for="add_loan_id">贷款ID：</label>
+    <input type="text" id="add_loan_id" name="add_loan_id" required>
+    <label for="add_loan_amount">贷款额度</label>
+    <input type="text" id="add_loan_amount" name="add_loan_amount" required>
+    <label for="add_customer_id">用户ID：</label>
+    <input type="text" id="add_customer_id" name="add_customer_id" required>
+    <label for="add_bank_name">支行：</label>
+    <input type="text" id="add_bank_name" name="add_bank_name" required>
+    <input type="submit" name="ADD" value="添加">
+</form>
+{% if add_res %}
+    <script>
+    showResult('添加', '{{add_res}}')
+    </script>
+{% endif %}
+
+
+
+<!-- 修改表单 -->
+<h2>修改贷款</h2>
+<form method="post">
+    <label for="old_loan_id">原贷款ID：</label>
+    <input type="text" id="old_loan_id" name="old_loan_id" required>
+    <br>
+    <label for="new_loan_id">新贷款ID：</label>
+    <input type="text" id="new_loan_id" name="new_loan_id" required>
+    <label for="new_loan_amount">新贷款额度：</label>
+    <input type="text" id="new_loan_amount" name="new_loan_amount" required>
+    <label for="new_unrepayed_amount">新未还款额度：</label>
+    <input type="text" id="new_unrepayed_amount" name="new_unrepayed_amount" required>
+    <label for="new_customer_id">新用户ID：</label>
+    <input type="text" id="new_customer_id" name="new_customer_id" required>
+    <label for="new_bank_name">新支行：</label>
+    <input type="text" name="new_bank_name" id="new_bank_name" required>
+    <input type="submit" name="UPDATE" value="修改">
+</form>
+{% if update_res %}
+    <script>
+    showResult('修改', '{{update_res}}')
+    </script>
+{% endif %}
+
+<!-- 删除表单 -->
+<h2>删除贷款</h2>
+<form id="deleteForm" method="post">
+    <label for="delete_loan_id">贷款ID：</label>
+    <input type="text" id="delete_loan_id" name="delete_loan_id" required>
+    <input type="submit" name="DELETE" value="删除" onclick="return confirmDelete(delete_loan_id.value)">
+</form>
+{% if delete_res %}
+    <script>
+    showResult('删除', '{{delete_res}}')
+    </script>
+{% endif %}
+
+<!-- 还款表单 -->
+<h2>还款</h2>
+<form method="post">
+    <label for="repay_loan_id">贷款ID：</label>
+    <input type="text" id="repay_loan_id" name="repay_loan_id" required>
+    <label for="repay_account_id">还款账户ID：</label>
+    <input type="text" id="repay_account_id" name="repay_account_id" required>
+    <label for="repay_amount">还款金额：</label>
+    <input type="text" id="repay_amount" name="repay_amount" required>
+    <input type="submit" name="REPAY" value="还款">
+</form>
+{% if repay_res %}
+    <script>
+    showResult('转账', '{{repay_res}}')
+    </script>
+{% endif %}
+
+<!-- 查询结果显示区域 -->
+<div id="searchResults">
+    <h2>查询结果</h2>
+    <!-- 这里将从后端传入的查询结果循环显示 -->
+    {% if search_res %}
+        <table>
+            <tr>
+                <th>贷款ID</th>
+                <th>贷款额度</th>
+                <th>未还款金额</th>
+                <th>用户ID</th>
+                <th>支行</th>
+            </tr>
+            {% for department in search_res %}
+                <tr>
+                    <td>{{ department[0] }}</td>
+                    <td>{{ department[1] }}</td>
+                    <td>{{ department[2] }}</td>
+                    <td>{{ department[3] }}</td>
+                    <td>{{ department[4] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>没有找到相关贷款。</p>
+    {% endif %}
+</div>
+
+</body>
+</html>
